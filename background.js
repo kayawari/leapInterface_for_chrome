@@ -53,16 +53,13 @@ function onframe(frame) {
             var pinkySpeed = pinkyPointable.tipVelocity;
 
             //executeScript('console.log(' + thumbSpeed + ');');
-            if(fingers.extened && ifin >= 5){
-                //If all fingers are extending (true)  && fingers count >= 5.
                 
-                if(thumbSpeed[1] > 200) {clickToLink(0);}
-                else if(indexSpeed[1] > 200) {clickToLink(1);}
-                else if(middleSpeed[1] > 200) {clickToLink(2);}
-                else if(ringSpeed[1] > 200) {clickToLink(3);}
-                else if(pinkySpeed[1] > 200) {clickToLink(4);}
-
-            }
+            if(thumbSpeed[1] > 500) {clickToLink(0);}
+            if(indexSpeed[1] > 500) {clickToLink(1);}
+            if(middleSpeed[1] > 500) {clickToLink(2);}
+            if(ringSpeed[1] > 500) {clickToLink(3);}
+            if(pinkySpeed[1] > 500) {clickToLink(4);}
+            //マイナス方向も判定に入れる？　＋　正確な値にするべきかも。
             
             
             if(gesture.type === "swipe"){
