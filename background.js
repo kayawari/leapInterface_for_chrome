@@ -1,8 +1,8 @@
+//jquery 2.x.x not supporting IE 6,7,8
 var connected = false; // Boolean: { false: disconnected, true: connected }
 var gestureState = 0;  // Number: { 0: none, 1: start, 2: progress }
 var leap = null;       // Leap.Controller instance
 var takeLinksList = 0;//リンクを指の本数分取得するが、そのスタートの番号...
-
 //五本指操作を検討したプログラム
 
 chrome.browserAction.onClicked.addListener(function() {
@@ -112,6 +112,7 @@ function clickToLink( fingersNum, fingersValue ){
     var i = takeLinksList;
     while( i < takeLinksList + fingersNum){
         executeScript('linkList.push(document.getElementsByTagName("a")[' + i + '].href);');
+        //executeScript(' linkList.push( $("a")[' + i + '].attr("href") ); ');
         i++;
     }
     //executeScript('console.log(linkList);');
