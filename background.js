@@ -4,6 +4,22 @@ var gestureState = 0;  // Number: { 0: none, 1: start, 2: progress }
 var leap = null;       // Leap.Controller instance
 var takeLinksList = 0;//リンクを指の本数分取得するが、そのスタートの番号...
 //五本指操作を検討したプログラム
+/*
+$(function(){
+   executeScript('console.log(' + extractFormTagsArray() + ' );');
+   executeScript('console.log(' + removeSameLinkArray() + ');');
+   executeScript('console.log(' + nullTextLinkArray() + ');');
+   
+   console.log( nullTextLinkArray(0) );
+   console.log( nullTextLinkArray(1) );
+   console.log( nullTextLinkArray(2) );
+   console.log( nullTextLinkArray(3) );
+   
+   extractFormTagsArray();
+   removeSameLinkArray();
+   nullTextLinkArray();
+});
+*/
 
 chrome.browserAction.onClicked.addListener(function() {
     connected = !connected; // toggle state
@@ -14,10 +30,11 @@ chrome.browserAction.onClicked.addListener(function() {
         leap = new Leap.Controller({
                     //host: "127.0.0.1",
                     //port: 6437,
-                    enableGestures: true,//ジェスチャ認識を利用するかどうか
+                    enableGestures: true//,ジェスチャ認識を利用するかどうか
                     //frameEventName: "animationFrame",
                     //useAllPlugins: true
                 });
+        chrome.tabs.executeScript(null, {file:"search.js"});
         leap.loop(onframe);
     } else {
         // TODO: disconnect impl
@@ -111,12 +128,12 @@ function clickToLink( fingersNum, fingersValue ){
     executeScript('var linkList = new Array();');
     var i = takeLinksList;
     while( i < takeLinksList + fingersNum){
-        executeScript('linkList.push(document.getElementsByTagName("a")[' + i + '].href);');
-        //executeScript(' linkList.push( $("a")[' + i + '].attr("href") ); ');
+        //executeScript('linkList.push(document.getElementsByTagName("a")[' + i + '].href);');
+        executeScript(' linkList.push(' + $ + '("a")[' + i + '].attr("href"));' );
         i++;
     }
-    //executeScript('console.log(linkList);');
-    executeScript('location.href = linkList[' + fingersValue + '];');
+    executeScript('console.log(linkList);');
+    //executeScript('location.href = linkList[' + fingersValue + '];');
 }
 
 function nextLinkSelecting( listNum ){
@@ -130,9 +147,8 @@ function previousLinkSelecting( listNum ){
     takeLinksList = listNum - 5;
 }
 
-function executeScript(code) {
+function executeScript( code ) {
     chrome.tabs.executeScript(null, {
         code: code
     });
 }
-
