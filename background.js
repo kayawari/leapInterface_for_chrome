@@ -4,29 +4,20 @@ var gestureState = 0;  // Number: { 0: none, 1: start, 2: progress }
 var leap = null;       // Leap.Controller instance
 var takeLinksList = 0;//リンクを指の本数分取得するが、そのスタートの番号...
 //五本指操作を検討したプログラム
-/*
-$(function(){
-   executeScript('console.log(' + extractFormTagsArray() + ' );');
-   executeScript('console.log(' + removeSameLinkArray() + ');');
-   executeScript('console.log(' + nullTextLinkArray() + ');');
-   
-   console.log( nullTextLinkArray(0) );
-   console.log( nullTextLinkArray(1) );
-   console.log( nullTextLinkArray(2) );
-   console.log( nullTextLinkArray(3) );
-   
-   extractFormTagsArray();
-   removeSameLinkArray();
-   nullTextLinkArray();
-});
-*/
 
 chrome.browserAction.onClicked.addListener(function() {
     connected = !connected; // toggle state
-
     if (connected) {
       //Leap.loop({ enableGestures: true }, onframe);
-      console.log("接続完了！");
+        executeScript('console.log("接続完了！");'); 
+        var formsObjects = {
+            links       :[],
+            notTextLinks:[]
+        }; 
+        chrome.storage.sync.get(formsObjects,function(items){
+            executeScript('console.log(' + JSON.stringify(items) + ');');
+        });
+
         leap = new Leap.Controller({
                     //host: "127.0.0.1",
                     //port: 6437,
@@ -34,11 +25,11 @@ chrome.browserAction.onClicked.addListener(function() {
                     //frameEventName: "animationFrame",
                     //useAllPlugins: true
                 });
-        chrome.tabs.executeScript(null, {file:"search.js"});
+        //chrome.tabs.executeScript(null, {file:"search.js"});
         leap.loop(onframe);
     } else {
         // TODO: disconnect impl
-        console.log("接続失敗");
+        executeScript("console.log('接続失敗');");
         leap.disconnect();
     }
     chrome.browserAction.setBadgeText({ text: connected ? "on" : "off" });
@@ -147,8 +138,8 @@ function previousLinkSelecting( listNum ){
     takeLinksList = listNum - 5;
 }
 
-function executeScript( code ) {
+function executeScript(code){
     chrome.tabs.executeScript(null, {
-        code: code
+        code:code
     });
 }

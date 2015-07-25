@@ -1,50 +1,26 @@
-chrome.tabs.executeScript(null, {file:"jquery-2.1.4.js"});
 $(function(){
-   executeScript('console.log(' + extractFormTagsArray() + ' );');
-   executeScript('console.log(' + removeSameLinkArray() + ');');
-   executeScript('console.log(' + nullTextLinkArray() + ');');
-   /*
-    console.log( nullTextLinkArray(0) );
-    console.log( nullTextLinkArray(1) );
-    console.log( nullTextLinkArray(2) );
-    console.log( nullTextLinkArray(3) );
-   */
-   extractFormTagsArray();
-   removeSameLinkArray();
-   nullTextLinkArray();
-
-});
-//この方法だと、リンクの順番がおかしくならない？いやいいのか？
-
-//リンク先がただの画像ページを抽出　=> 後回しにする
-//aタグのhrefの末尾が.pngなどの画像拡張子だったら、消す。（そんな場合のリンクって実際あるのから？
-/*
-function extractImgHref(){
-    var imgHrefList = [];
-    $('a').each(function(number,element){
-        if( $(element).href 
-    
-}
-*/
-
-function executeScript(code){
-    chrome.tabs.executeScript(null, {
-        code:code
+    removeInputTags();
+    var linksArray       = removeSameLinkArray();
+    var textLinksArray   = nullTextLinkArray();
+    var formObjects = {
+        links           : linksArray,
+        notTextLinks    : textLinksArray
+    };
+    chrome.storage.sync.set(formObjects,function(){
+        console.log("%cset extract objects to chrome storage !!","color:green;");
     });
-}
+});
 
-function extractFormTagsArray(){
-     var formList = [];
-     $('form').each(function(number){
-        formList[number] = $(this);
-     });
-     return formList;
+function removeInputTags(){
+    $('input,select,form,textarea').each(function(number){
+        $(this).remove();
+    });
 }
 
 function removeSameLinkArray(){
     var linkList = [];
-    $('a').each(function(number){
-        linkList[number] = $(this).href;
+    $("a").each(function(){
+        linkList.push( $(this).attr("href") );
     });
     linkList.filter(function(x,i,self){
         return self.indexOf(x) === i;
@@ -75,4 +51,13 @@ function nullTextLinkArray(){
     return TextLinkList,AltLinkList,notTextLinkList,notAltLinkList;
 }
 
-
+//リンク先がただの画像ページを抽出　=> 後回しにする
+//aタグのhrefの末尾が.pngなどの画像拡張子だったら、消す。（そんな場合のリンクって実際あるのから？
+/*
+function extractImgHref(){
+    var imgHrefList = [];
+    $('a').each(function(number,element){
+        if( $(element).href 
+    
+}
+*/
