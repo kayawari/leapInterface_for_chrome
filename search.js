@@ -1,13 +1,18 @@
 $(function(){
     removeInputTags();
-    var linksArray       = removeSameLinkArray();
-    var textLinksArray   = nullTextLinkArray();
+    var linksArray      = removeSameLinkArray();
+    var imgAltArray     = removeImgNotAltArray(0);
+    var imgNotAltArray  = removeImgNotAltArray(1);
+    var headTagsArray   = extractHeadTagsArray();
     var formObjects = {
-        links           : linksArray,
-        notTextLinks    : textLinksArray
+        links       :linksArray,
+        imgAlt      :imgAltArray,
+        imgNotAlt   :imgNotAltArray,
+        headTags    :headTagsArray
     };
-    chrome.storage.sync.set(formObjects,function(){
-        console.log("%cset extract objects to chrome storage !!","color:green;");
+    chrome.storage.local.set(formObjects,function(){
+        console.log("%cset extract objects to local storage !!","color:green;");
+        console.log(formObjects);
     });
 });
 
@@ -20,44 +25,68 @@ function removeInputTags(){
 function removeSameLinkArray(){
     var linkList = [];
     $("a").each(function(){
-        linkList.push( $(this).attr("href") );
+        linkList.push({
+            "uri"   :$(this).attr("href"),
+            "text"  :$(this).text(),
+            "title" :$(this).attr("title")
+        });
     });
-    linkList.filter(function(x,i,self){
-        return self.indexOf(x) === i;
-    });
+    //重複削除前
+    //console.log('linkList:',linkList);
+    
+    var arrObj = {};
+    for(var i=0; i<linkList.length; i++){
+        arrObj[linkList[i]['uri']] = linkList[i];
+    }
+    linkList = [];
+    for(var key in arrObj){
+        linkList.push(arrObj[key]);
+    }
+    //重複削除後
+    //console.log(linkList,"color:pink");
+   
+    /* 
+    for(var i=0; i<linkList.length; i++){
+        if(linkList[i]['text'] === undefined){
+            linkList.splice(i,1);
+        }
+    }//textがないリンクを削除する
+    */
+
     return linkList;
 }
 
-function nullTextLinkArray(){
-    var TextLinkList = [],
-        AltLinkList = [],
-        notTextLinkList = [],
-        notAltLinkList = [];
-        //テキスト、alt属性がないものあるもので分ける。
-    $('a').each(function(number, element){
-        if( $(element).text() !== undefined ){//effective js 参照
-            TextLinkList[number] = $(element).href;
+function removeImgNotAltArray(){
+    var imgAltLink      = [],
+        imgNotAltLink   = [];
+    $('a > img').each(function(){
+        if( $(this).attr('alt') !== undefined ){
+            imgAltLink.push({
+                'uri'   :$(this).attr('href'),
+                'text'  :$(this).attr('alt')
+            });
         } else {
-            notTextLinkList[number] = $(element).href;
+            imgNotAltLink.push( $(this).attr('href') );
         }
     });
-    $('a img').each(function(number, element){
-        if( $(element).attr('alt') !== undefined ){//effective js 参照
-            AltLinkList[number] = $(element).href;
-        } else {
-            notAltLinkList[number] = $(element).href;
-        }
-    });
-    return TextLinkList,AltLinkList,notTextLinkList,notAltLinkList;
+    
+    var arrObj = {};
+    for(var i=0; i<imgAltLink.length; i++){
+        arrObj[imgAltLink[i]['uri']] = imgAltLink[i];
+    } //uriが重複する要素を削除
+    imgAltLink = [];
+    for(var key in arrObj){
+        imgAltLink.push(arrObj[key]);
+    }
+
+    return imgAltLink,imgNotAltLink;
 }
 
-//リンク先がただの画像ページを抽出　=> 後回しにする
-//aタグのhrefの末尾が.pngなどの画像拡張子だったら、消す。（そんな場合のリンクって実際あるのから？
-/*
-function extractImgHref(){
-    var imgHrefList = [];
-    $('a').each(function(number,element){
-        if( $(element).href 
-    
+function extractHeadTagsArray(){
+    var headTagsArray = [];
+    $('h1,h2,h3,h4,h5,h6').each(function(){
+        headTagsArray.push( $(this).text() );
+    });
+    return headTagsArray;
 }
-*/
+

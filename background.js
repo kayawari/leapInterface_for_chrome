@@ -12,9 +12,11 @@ chrome.browserAction.onClicked.addListener(function() {
         executeScript('console.log("接続完了！");'); 
         var formsObjects = {
             links       :[],
-            notTextLinks:[]
+            imgAlt      :[],
+            imgNotAlt   :[],
+            headTags    :[]
         }; 
-        chrome.storage.sync.get(formsObjects,function(items){
+        chrome.storage.local.get(formsObjects,function(items){
             executeScript('console.log(' + JSON.stringify(items) + ');');
         });
 
