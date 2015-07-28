@@ -12,7 +12,7 @@ $(function(){
     };
     chrome.storage.local.set(formObjects,function(){
         console.log("%cset extract objects to local storage !!","color:green;");
-        console.log(formObjects);
+        //console.log(formObjects);
     });
 });
 
