@@ -48,14 +48,11 @@ function removeSameLinkArray(){
     }
     //重複削除後
     //console.log(linkList,"color:pink");
-   
-    /* 
-    for(var i=0; i<linkList.length; i++){
-        if(linkList[i]['text'] === undefined){
-            linkList.splice(i,1);
+    linkList.some(function(v,k){
+        if(v.text === undefined || v.text === null || v.text == ''){
+            linkList.splice(k,1);
         }
-    }//textがないリンクを削除する
-    */
+    });//textがないリンクを削除する
 
     return linkList;
 }
