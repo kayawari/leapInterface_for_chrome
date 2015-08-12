@@ -12,6 +12,7 @@ var formsObjects = {
 };
 var formsObjectsLinksLength = 0;
 var clickFlag = true;
+var swipeFlag = true;
 
 chrome.browserAction.onClicked.addListener(function() {
     connected = !connected; // toggle state
@@ -47,19 +48,19 @@ function onframe(frame) {
         console.log("接続失敗");
         return;
     }
-    var i = 0;
-    var hand = frame.hands[0];//hand class
-    var finger = hand.fingers[0];//fingers class
-    var thumbPointable = frame.pointables[0];//Pointable class
-    var indexPointable = frame.pointables[1];
+    var hand            = frame.hands[0];//hand class
+    var finger          = hand.fingers[0];//fingers class
+    var thumbPointable  = frame.pointables[0];//Pointable class
+    var indexPointable  = frame.pointables[1];
     var middlePointable = frame.pointables[2];
-    var ringPointable = frame.pointables[3];
-    var pinkyPointable = frame.pointables[4];
+    var ringPointable   = frame.pointables[3];
+    var pinkyPointable  = frame.pointables[4];
     //frame.pointable[5]以降は、2本目の手の指の数になる。
-    var fingersNum = 5;
-    var iges = frame.gestures.length;
-    var ifin = frame.fingers.length;//The number of th finger
+    var fingersNum      = 5;
+    var iges            = frame.gestures.length;
+    var ifin            = frame.fingers.length;//The number of th finger
 
+    var i = 0;
     if(iges > 0){
         for (; i < iges; ++i) {
             var gesture = frame.gestures[i];
@@ -110,10 +111,44 @@ function onframe(frame) {
 
 function swipe(x, y, z, listNum) {
     executeScript('console.log("swipe!!");');
-    if (x < 0) {
-        previousLinkSelecting(takeLinksList);
-    } else {
-        nextLinkSelecting(listNum);
+    if(x < 100){ nextLinkSelecting(listNum); }
+    if(x > 100){ previousLinkSelecting(takeLinksList); }
+    if(y > 200 || y < 200){ recAPI(x,y); } 
+}
+
+function recAPI(x,y){
+    var recog = new webkitSpeechRecongnition();
+    recog.lang = 'ja-JP';
+    var speechRecogText = new SpeechSynthesisUtterance();
+    speechRecogText.lang = 'ja-JP';
+    recog.onresult = function(e){
+        var results = e.results;
+        var searchResults = [];
+        executeScript('console.log(' + results[i][0].transcript + ');');
+        chrome.storage.local.get(formsObjects,function(items){
+            for(var i = e.resultIndex;i < results.length;i++){
+                for(var j=0; j<items.link.length; j++){
+                    var recText = results[i][0].transcript.toString();
+                    var localStorageText = items.links[j].text.toString();
+                    if( localStorageText.indexOf(recText,0) > 0 ){
+                        searchResults.push(items.links[j].text);
+                    }
+                }
+            }
+        });
+        //検索した文字列の音声解析
+    };
+    recog.onend = function(){ swipeFlag = true; };
+
+    if(y > 200){
+        speechRecogText.text = '検索開始。';
+        speechSynthesis.speak(speechRecogText);
+        this.recog.start();
+    }
+    if(y < 200){
+        speechRecogText.text = '検索開始。';
+        speechSynthesis.speak(speechRecogText);
+        this.recog.stop();
     }
 }
 
@@ -129,28 +164,22 @@ function clickToLink( fingersNum, fingersValue ){
             speechText.text = clickedURIText.toString();
             speechSynthesis.speak(speechText);
             executeScript('location.href="' + clickedURI.toString() + '";');
-            executeScript('console.log("clickToLink : "' + clickedURIText.toString() + ');');
-            speechText.onend = function(e){
-                clickFlag = true;
-            };
+
+            speechText.onend = function(e){ clickFlag = true; };
         });
     }
 }
 
 function nextLinkSelecting( listNum ){
-    if(formsObjectsLinksLength > takeLinksList){
-        executeScript('console.log("Refresh next link!!");');
-        takeLinksList = listNum + 5;
-    }
+    executeScript('console.log("Refresh next link!!");');
+    takeLinksList = listNum + 5;
     speechText();
 }
 
 //スワイプ左は、history.backに利用しているので、他のジェスチャが必要。
 function previousLinkSelecting( listNum ){
-    if(takeLinksList > 0){
-        executeScript('console.log("Refresh previous link!!");');
-        takeLinksList = listNum - 5;
-    }
+    executeScript('console.log("Refresh previous link!!");');
+    takeLinksList = listNum - 5;
     speechText();
 }
 
@@ -162,7 +191,7 @@ function executeScript(code){
 
 function speechText(){
     var count = takeLinksList;
-    var speechText = [];//speechの再生を順に行うため、一度配列に格納
+    var speechText = []; //speechの再生を順に行うため、一度配列に格納
     chrome.storage.local.get(formsObjects,function(items){
         for(var i = count,j = 0; i < count + 5; i++,j++){
             speechText.push( new SpeechSynthesisUtterance(items.links[i].text.toString()) );
@@ -173,4 +202,19 @@ function speechText(){
     });
 }
 
+var tabCount = 0;
+//タブキーによる音声案内
+$(window).keydown(function(e){
+    //e.preventDefault();
+    if(e.keyCode === 9){
+        executeScript('console.log("はいはい");');
+        chrome.storage.local.get(formsObjects,function(items){
+            var speechText = new SpeechSynthesisUtterance();
+            speechText.lang = 'ja-JP';
+            speechText.text = items.links[tabCount].text.toString();
+            speechSynthesis.speak(speechText);
+        });
+    }
+    //tabで一つ前のワードに戻る機能も追加する 
+});
 
