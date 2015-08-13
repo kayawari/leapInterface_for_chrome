@@ -25,6 +25,8 @@ chrome.browserAction.onClicked.addListener(function() {
         });
         speechText(1);//変更点
 
+        //Leap controllerオブジェクトを生成。
+        /*
         leap = new Leap.Controller({
                     //host: "127.0.0.1",
                     //port: 6437,
@@ -34,6 +36,7 @@ chrome.browserAction.onClicked.addListener(function() {
                 });
         //chrome.tabs.executeScript(null, {file:"search.js"});
         leap.loop(onframe);
+        */
     } else {
         // TODO: disconnect impl
         executeScript("console.log('接続失敗');");
@@ -188,6 +191,20 @@ function speechText(num){
         }
     });
 }
+
+chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
+    //executeScript('console.log(' + req + ');');
+    //executeScript('console.log(' + sen + ');');
+    //executeScript('console.log(' + sendRes + ');');
+    
+    if(req.keycode == 69){//type 'E'
+        swipe(-10,0,0,takeLinksList);//previous link
+    }
+    if(req.keycode == 82){//type 'R'
+        swipe(10,0,0,takeLinksList);//next link
+    }
+});
+
 /*
 function speechText(){
     var count = takeLinksList;
@@ -226,21 +243,6 @@ function executeScript(code){
         code:code
     });
 }
-
-var tabCount = 0;
-//タブキーによる音声案内
-$(window).keydown(function(e){
-    //e.preventDefault();
-    if(e.keyCode === 9){
-        chrome.storage.local.get(formsObjects,function(items){
-            var speechText = new SpeechSynthesisUtterance();
-            speechText.lang = 'ja-JP';
-            speechText.text = items.links[tabCount].text.toString();
-            speechSynthesis.speak(speechText);
-        });
-    }
-    //tabで一つ前のワードに戻る機能も追加する 
-});
 
 function recAPI(x,y){
     var recog = new webkitSpeechRecongnition();

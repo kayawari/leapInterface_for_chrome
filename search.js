@@ -26,6 +26,19 @@ function removeInputTags(){
     });
 }
 
+$(window).keydown(function(e){
+    e.preventDefault();
+    if(e.keyCode == 69){
+        chrome.runtime.sendMessage({keycode:69},function(response){
+            console.log('type E');
+        });
+    }else if(e.keyCode == 82){
+        chrome.runtime.sendMessage({keycode:82},function(response){
+            console.log('type R');
+        });
+    }
+});
+
 function removeSameLinkArray(){
     var linkList = [];
     $("a").each(function(){
