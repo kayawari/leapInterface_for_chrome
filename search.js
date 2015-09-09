@@ -103,4 +103,3 @@ function extractHeadTagsArray(){
     });
     return headTagsArray;
 }
-

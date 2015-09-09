@@ -136,39 +136,19 @@ function clickToLink( fingersNum, fingersValue ){
     }
 }
 
-//実験１：５つずつ
-//実験２：１つずつ
-//実験３：見出し
-//実験４：マウス
-//
-//実験1,2,3では、speechText()の引数の値を１or５に変更する
-//実験1,2,3では、saikiCount()の引数の値を1or5に変更する
-//注意！！ ===> 最初に呼び出すspeechTextの値を変更することも忘れずに。
+var saikiCount = 1;//実験用変更点
 function nextLinkSelecting( listNum ){
     executeScript('console.log("Refresh next link!!");');
-    
-    //実験1
-    //takeLinksList = listNum + 5;
-    
-    //実験2,3
-    takeLinksList = listNum + 1;
-
-    speechText(1);//変更点
+    takeLinksList = listNum + saikiCount;
+    speechText(saikiCount);
 }
 
 function previousLinkSelecting( listNum ){
     executeScript('console.log("Refresh previous link!!");');
-
-    //実験1
-    //takeLinksList = listNum - 5;
-    
-    //実験2,3
-    takeLinksList = listNum - 1;
-    
-    speechText(1);//変更点
+    takeLinksList = listNum - saikiCount; 
+    speechText(saikiCount);
 }
 
-var saikiCount = 1;//変更点
 function speechText(num){
     var count = takeLinksList;
     var i = count + num;
@@ -193,10 +173,6 @@ function speechText(num){
 }
 
 chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
-    //executeScript('console.log(' + req + ');');
-    //executeScript('console.log(' + sen + ');');
-    //executeScript('console.log(' + sendRes + ');');
-    
     if(req.keycode == 69){//type 'E'
         swipe(-10,0,0,takeLinksList);//previous link
     }
@@ -204,39 +180,6 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         swipe(10,0,0,takeLinksList);//next link
     }
 });
-
-/*
-function speechText(){
-    var count = takeLinksList;
-    var speechText = []; //speechの再生を順に行うため、一度配列に格納
-    chrome.storage.local.get(formsObjects,function(items){
-        
-        //実験1
-        for(var i = count,j = 0; i < count + 5; i++,j++){
-        
-        //実験2,3
-        //for(var i = count,j = 0; i < count + 1; i++,j++){
-            
-            //実験1,2
-            speechText.push( new SpeechSynthesisUtterance(items.links[i].text.toString()) );
-            executeScript('console.log("' + items.links[i].text.toString() + '");');
-
-            //実験3
-            //speechText.push( new SpeechSynthesisUtterance(items.headTags[i].toString()) );
-            //executeScript('console.log("' + items.headTags[i].toString() + '");');
-            
-            speechText[j].lang = 'ja-JP';
-            speechSynthesis.speak(speechText[j]);
-            speechText[j].onend = function(e){
-
-        }
-    });
-}
-*/
-
-//=====================================================================
-//=====================================================================
-//=====================================================================
 
 function executeScript(code){
     chrome.tabs.executeScript(null, {
@@ -249,6 +192,7 @@ function recAPI(x,y){
     recog.lang = 'ja-JP';
     var speechRecogText = new SpeechSynthesisUtterance();
     speechRecogText.lang = 'ja-JP';
+
     recog.onresult = function(e){
         var results = e.results;
         var searchResults = [];
@@ -256,16 +200,20 @@ function recAPI(x,y){
         chrome.storage.local.get(formsObjects,function(items){
             for(var i = e.resultIndex;i < results.length;i++){
                 for(var j=0; j<items.link.length; j++){
-                    var recText = results[i][0].transcript.toString();
+                    var recText = results[i][0].transcript.toString();//認識テキスト
+                    console.log(recText);
                     var localStorageText = items.links[j].text.toString();
+                    //下が検索
                     if( localStorageText.indexOf(recText,0) > 0 ){
                         searchResults.push(items.links[j].text);
+                        console.log(searchResults);
                     }
                 }
             }
         });
-        //検索した文字列の音声解析
+
     };
+
     recog.onend = function(){ swipeFlag = true; };
 
     if(y > 200){
