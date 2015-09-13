@@ -172,15 +172,6 @@ function speechText(num){
     });
 }
 
-chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
-    if(req.keycode == 69){//type 'E'
-        swipe(-10,0,0,takeLinksList);//previous link
-    }
-    if(req.keycode == 82){//type 'R'
-        swipe(10,0,0,takeLinksList);//next link
-    }
-});
-
 function executeScript(code){
     chrome.tabs.executeScript(null, {
         code:code
