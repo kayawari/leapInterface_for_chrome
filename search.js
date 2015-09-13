@@ -1,7 +1,3 @@
-var count = 0;
-    count++;
-    console.log(count);
-
 $(function(){
     removeInputTags();
     var linksArray      = removeSameLinkArray();
@@ -32,9 +28,17 @@ $(window).keydown(function(e){
         chrome.runtime.sendMessage({keycode:69},function(response){
             console.log('type E');
         });
-    }else if(e.keyCode == 82){
+    }
+    
+    if(e.keyCode == 82){
         chrome.runtime.sendMessage({keycode:82},function(response){
             console.log('type R');
+        });
+    }
+    
+    if(e.keyCode == 90){
+        chrome.runtime.sendMessage({keycode:90},function(response){
+            console.log('type Z');
         });
     }
 });
