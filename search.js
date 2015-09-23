@@ -52,9 +52,8 @@ function removeSameLinkArray(){
             "title" :$(this).attr("title")
         });
     });
-    //重複削除前
-    //console.log('linkList:',linkList);
     
+    //リンクの重複削除
     var arrObj = {};
     for(var i=0; i<linkList.length; i++){
         arrObj[linkList[i]['uri']] = linkList[i];
@@ -63,15 +62,16 @@ function removeSameLinkArray(){
     for(var key in arrObj){
         linkList.push(arrObj[key]);
     }
-    //重複削除後
-    //console.log(linkList,"color:pink");
-    linkList.some(function(v,k){
-        if(v.text === undefined || v.text === null || v.text == ''){
-            linkList.splice(k,1);
+    
+    //textがないリンク削除
+    for(var i=0; i<linkList.length; i++){
+        if(!linkList[i].text || linkList[i].text === null || linkList[i].text === undefined || linkList[i].text.length == 0 || linkList[i].text === ""){
+            linkList.splice(i,1);
+            i--;
         }
-    });//textがないリンクを削除する
+    }
 
-    return linkList;
+    return sortLinkByLengthOfTheSentence(linkList);
 }
 
 function removeImgNotAltArray(){
@@ -87,11 +87,12 @@ function removeImgNotAltArray(){
             imgNotAltLink.push( $(this).attr('href') );
         }
     });
-    
+   
+    //uriが重複する要素を削除
     var arrObj = {};
     for(var i=0; i<imgAltLink.length; i++){
         arrObj[imgAltLink[i]['uri']] = imgAltLink[i];
-    } //uriが重複する要素を削除
+    }
     imgAltLink = [];
     for(var key in arrObj){
         imgAltLink.push(arrObj[key]);
@@ -105,5 +106,44 @@ function extractHeadTagsArray(){
     $('h1,h2,h3,h4,h5,h6').each(function(){
         headTagsArray.push( $(this).text() );
     });
-    return headTagsArray;
+
+    //textがないhタグ削除
+    for(var i=0; i<headTagsArray.length; i++){
+        if(!headTagsArray[i] || headTagsArray[i] === null || headTagsArray[i] === undefined || headTagsArray[i].length == 0 || headTagsArray[i] === ""){
+            headTagsArray.splice(i,1);
+            i--;
+        }
+    }
+
+    return sortHTagByLengthOfTheSentence(headTagsArray);
+}
+
+function sortHTagByLengthOfTheSentence(processedList){
+    var listLength = processedList.length;
+    var temp;
+    for(var i=0; i<listLength-1; i++){
+        for(var j=listLength-1; j>i; j--){
+            if( processedList[j-1].length > processedList[j].length ){
+                temp = processedList[j-1];
+                processedList[j-1] = processedList[j];
+                processedList[j] = temp;
+            }
+        }
+    }
+    return processedList;
+}
+
+function sortLinkByLengthOfTheSentence(processedList){
+    var listLength = processedList.length;
+    var temp;
+    for(var i=0; i<listLength-1; i++){
+        for(var j=listLength-1; j>i; j--){
+            if( processedList[j-1].text.length > processedList[j].text.length ){
+                temp = processedList[j-1];
+                processedList[j-1] = processedList[j];
+                processedList[j] = temp;
+            }
+        }
+    }
+    return processedList;
 }
