@@ -1,32 +1,55 @@
 //jquery 2.x.x not supporting IE 6,7,8
-var takeLinksList = 0;
+var takeLinksList   = 0;
+var takeHTagList    = 0;
+var takeDomSortList = 0;
 var formsObjects = {
     links       :[],
     imgAlt      :[],
     imgNotAlt   :[],
+};
+var hTagFormsObjects = {
     headTags    :[]
 };
+var domSortFormsObjects = [];
 var formsObjectsLinksLength = 0;
 var clickFlag = true;
+var clickSwitcher = 1;
 
 chrome.browserAction.onClicked.addListener(function() {
     executeScript('console.log("プログラム開始");');
-
-    chrome.storage.local.get(formsObjects,function(items){
-        executeScript('console.log('+JSON.stringify(items)+');');
-        formsObjectsLinksLength = items.links.length;
-    });
-    speechText(takeLinksList);
-    
     chrome.browserAction.setBadgeText({ text: connected ? "on" : "off" });
 });
 
 chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
+    if(req.keycode == 49){//type '1'
+        clickSwitcher = 1;
+        chrome.storage.local.get(formsObjects,function(items){
+            executeScript('console.log('+JSON.stringify(items)+');');
+            formsObjectsLinksLength = items.links.length;
+        });
+        speechText_links(takeLinksList);
+    }
+    if(req.keycode == 50){//type '2'
+        clickSwitcher = 2
+        chrome.storage.local.get(hTagFormsObjects,function(items){
+            executeScript('console.log('+JSON.stringify(items)+');');
+            formsObjectsLinksLength = items.links.length;
+        });
+        speechText_hTags(takeHTagList);
+    }
+    if(req.keycode == 51){//type '3'
+        clickSwitcher = 3;
+        chrome.storage.local.get(domSortFormsObjects,function(items){
+            executeScript('console.log('+JSON.stringify(items)+');');
+            formsObjectsLinksLength = items.links.length;
+        });
+        speechText_domSort(takeDomSortList);
+    }
     if(req.keycode == 69){//type 'E'
-        previousLinkSelecting(takeLinksList);
+        previousLinkSelecting();
     }
     if(req.keycode == 82){//type 'R'
-        nextLinkSelecting(takeLinksList);
+        nextLinkSelecting();
     }
     if(req.keycode == 90){//type 'Z'
         clickToLink();
@@ -34,6 +57,7 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
 });
 
 function clickToLink(){
+    if(clickSwitcher != 1) return 0;
     if(clickFlag){
         clickFlag = false;
         var clickedURINumber = takeLinksList;
@@ -52,28 +76,67 @@ function clickToLink(){
     }
 }
 
-function nextLinkSelecting( listNum ){
+function nextLinkSelecting(){
     executeScript('console.log("Refresh next link.");');
-    takeLinksList = listNum + 1;
-    speechText(takeLinksList);
+    switchSpeechText(1);
 }
 
-function previousLinkSelecting( listNum ){
+function previousLinkSelecting(){
     executeScript('console.log("Refresh previous link.");');
-    if(listNum > 0){ takeLinksList = listNum - 1; } 
-    speechText(takeLinksList);
+    if(takeLinksList > 0 || takeHTagList > 0 || takeDomSortList > 0){
+        switchSpeechText(-1);
+    }
 }
 
-function speechText(num){
+function switchSpeechText(num){
+    if(clickSwitcher === 1) {
+        speechText_links(takeLinksList);
+        //executeScript('console.log('+ clickSwitcher +');');
+        takeLinksList = takeLinksList + num;
+    }
+    if(clickSwitcher === 2) {
+        speechText_hTags(takeHTagList);
+        //executeScript('console.log('+ clickSwitcher +');');
+        takeHTagList = takeHTagList + num;
+    }
+    if(clickSwitcher === 3){
+        speechText_domSort(takeDomSortList);
+        //executeScript('console.log('+ clickSwitcher +');');
+        takeDomSortList = takeDomSortList + num;
+    }
+}
+
+function speechText_links(num){
+    confirmStausOfSpeechsynthesis();
     chrome.storage.local.get(formsObjects,function(items){
-        var msg = new SpeechSynthesisUtterance(items.links[num].text.toString());
-        //var msg = new SpeechSynthesisUtterance(items.headTags[num].toString());
+        var msg = new SpeechSynthesisUtterance();
         msg.text = items.links[num].text.toString();
-        //msg.text = items.headTags[num].toString();
         executeScript('console.log("' + msg.text + '");');
         msg.lang = 'ja-JP';
         speechSynthesis.speak(msg);
     });
+}
+function speechText_hTags(num){
+    confirmStausOfSpeechsynthesis();
+    chrome.storage.local.get(hTagFormsObjects,function(items){
+        var msg = new SpeechSynthesisUtterance(items.headTags[num].toString());
+        msg.text = items.headTags[num].toString();
+        executeScript('console.log("' + msg.text + '");');
+        msg.lang = 'ja-JP';
+        speechSynthesis.speak(msg);
+    });
+}
+function speechText_domSort(num){
+    confirmStausOfSpeechsynthesis();
+    chrome.storage.local.get(domSortFormsObjects,function(items){
+    });
+}
+
+function confirmStausOfSpeechsynthesis(){
+    if(!'SpeechSynthesisUtterance' in window){
+        alert('web speech APIに未対応');
+        return;
+    }
 }
 
 function executeScript(code){

@@ -1,25 +1,68 @@
 $(function(){
+    //はじめにフォームタグなどを削除
     removeInputTags();
     var linksArray      = removeSameLinkArray();
     var imgAltArray     = removeImgNotAltArray(0);
     var imgNotAltArray  = removeImgNotAltArray(1);
-    var headTagsArray   = extractHeadTagsArray();
     var formObjects = {
         links       :linksArray,
         imgAlt      :imgAltArray,
         imgNotAlt   :imgNotAltArray,
+    };
+    chrome.storage.local.set(formObjects,function(){
+        console.log("%cset form objects to local storage !!","color:green;");
+    });
+
+    var headTagsArray   = extractHeadTagsArray();
+    var formObjects = {
         headTags    :headTagsArray
     };
-    var topNode = $('body');
-    extractDOMTree(topNode,1);
-    console.log("%cextract objects with DOM node!!","color:green");
-    console.log(all_arr);
-    //あとは、chrome.strageにぶち込む
-
     chrome.storage.local.set(formObjects,function(){
-        console.log("%cset extract objects to local storage !!","color:green;");
-        //console.log(formObjects);
+        console.log("%cset hTag objects to local storage !!","color:blue;");
     });
+
+    var sortFormObject = [];
+    chrome.storage.local.set(sortFormObjects,function(){
+        var topNode = $('body');
+        extractDOMTree(topNode,1);
+        console.log("%cset form objects with DOM to local storage !!","color:red");
+        console.log(all_arr);
+    });
+});
+
+$(window).keydown(function(e){
+    e.preventDefault();
+
+    if(e.keyCode == 49){
+        chrome.runtime.sendMessage({keycode:49},function(response){
+           //console.log('type 1');
+        });
+    }
+    if(e.keyCode == 50){
+        chrome.runtime.sendMessage({keycode:50},function(response){
+            //console.log('type 2');
+        });
+    }
+    if(e.keyCode == 51){
+        chrome.runtime.sendMessage({keycode:51},function(response){
+            //console.log('type 3');
+        });
+    }
+    if(e.keyCode == 69){
+        chrome.runtime.sendMessage({keycode:69},function(response){
+            //console.log('type E');
+        });
+    }
+    if(e.keyCode == 82){
+        chrome.runtime.sendMessage({keycode:82},function(response){
+            //console.log('type R');
+        });
+    }
+    if(e.keyCode == 90){
+        chrome.runtime.sendMessage({keycode:90},function(response){
+            //console.log('type Z');
+        });
+    }
 });
 
 function removeInputTags(){
@@ -27,27 +70,6 @@ function removeInputTags(){
         $(this).remove();
     });
 }
-
-$(window).keydown(function(e){
-    e.preventDefault();
-    if(e.keyCode == 69){
-        chrome.runtime.sendMessage({keycode:69},function(response){
-            console.log('type E');
-        });
-    }
-    
-    if(e.keyCode == 82){
-        chrome.runtime.sendMessage({keycode:82},function(response){
-            console.log('type R');
-        });
-    }
-    
-    if(e.keyCode == 90){
-        chrome.runtime.sendMessage({keycode:90},function(response){
-            console.log('type Z');
-        });
-    }
-});
 
 function removeSameLinkArray(){
     var linkList = [];
