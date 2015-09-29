@@ -72,7 +72,7 @@ function speechText(num){
         //msg.text = items.headTags[num].toString();
         executeScript('console.log("' + msg.text + '");');
         msg.lang = 'ja-JP';
-        speechSynthesis.speak(msg);    
+        speechSynthesis.speak(msg);
     });
 }
 

@@ -10,6 +10,12 @@ $(function(){
         imgNotAlt   :imgNotAltArray,
         headTags    :headTagsArray
     };
+    var topNode = $('body');
+    extractDOMTree(topNode,1);
+    console.log("%cextract objects with DOM node!!","color:green");
+    console.log(all_arr);
+    //あとは、chrome.strageにぶち込む
+
     chrome.storage.local.set(formObjects,function(){
         console.log("%cset extract objects to local storage !!","color:green;");
         //console.log(formObjects);
@@ -142,8 +148,45 @@ function sortLinkByLengthOfTheSentence(processedList){
                 temp = processedList[j-1];
                 processedList[j-1] = processedList[j];
                 processedList[j] = temp;
+                //bubble sort
             }
         }
     }
     return processedList;
+}
+
+var all_arr = [];
+function extractDOMTree(nodeObject,layerNum){
+    var temp_arr = [];
+    var nodeObjectChildren = nodeObject.children();
+    var nodeLength = nodeObjectChildren.length;
+
+    for(var i=0;i<nodeLength; i++){
+        var tag = $(nodeObjectChildren[i]).get(0).tagName;
+        console.log(tag);
+
+        if(tag == 'a' || tag == 'A'){
+            temp_arr.push({
+                text: $(nodeObjectChildren[i]).text(),
+                uri : $(nodeObjectChildren[i]).attr('href')
+            });
+        }
+    }
+    if(temp_arr.length != 0){
+        all_arr.push(hash_key(layerNum,temp_arr));
+    }
+
+    for(var j=0;j<nodeLength;j++){
+        if(nodeObjectChildren){
+            extractDOMTree($(nodeObjectChildren[j]),layerNum + 1);
+        }
+    }
+}
+
+//ハッシュのkeyに変数を利用するための関数
+//ES6形式に変更？
+function hash_key(key,value){
+    var h = {};
+    h[key] = value;
+    return h;
 }
