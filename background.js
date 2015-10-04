@@ -10,7 +10,9 @@ var formsObjects = {
 var hTagFormsObjects = {
     headTags    :[]
 };
-var domSortFormsObjects = [];
+var domSortFormsObjects = {
+    DOMObjects :[]
+};
 var formsObjectsLinksLength = 0;
 var clickFlag = true;
 var clickSwitcher = 1;

@@ -21,12 +21,13 @@ $(function(){
         console.log("%cset hTag objects to local storage !!","color:blue;");
     });
 
-    var sortFormObject = [];
-    chrome.storage.local.set(sortFormObjects,function(){
-        var topNode = $('body');
-        extractDOMTree(topNode,1);
+    var topNode = $('body');
+    var all_arr = extractDOMTree(topNode,1);
+    var sortFormObject = {
+        DOMObjects : all_arr
+    };
+    chrome.storage.local.set(sortFormObject,function(){
         console.log("%cset form objects with DOM to local storage !!","color:red");
-        console.log(all_arr);
     });
 });
 
@@ -185,7 +186,7 @@ function extractDOMTree(nodeObject,layerNum){
 
     for(var i=0;i<nodeLength; i++){
         var tag = $(nodeObjectChildren[i]).get(0).tagName;
-        console.log(tag);
+        //console.log(tag);
 
         if(tag == 'a' || tag == 'A'){
             temp_arr.push({
@@ -203,6 +204,7 @@ function extractDOMTree(nodeObject,layerNum){
             extractDOMTree($(nodeObjectChildren[j]),layerNum + 1);
         }
     }
+    return all_arr;
 }
 
 //ハッシュのkeyに変数を利用するための関数
