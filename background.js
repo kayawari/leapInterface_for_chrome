@@ -5,17 +5,20 @@ var takeDomSortList = 0;
 var formsObjects = {
     links       :[],
     imgAlt      :[],
-    imgNotAlt   :[],
+    imgNotAlt   :[]
 };
 var hTagFormsObjects = {
     headTags    :[]
 };
 var domSortFormsObjects = {
-    DOMObjects :[]
+    DOMObjects :[],
+    maxDomLayer:0
 };
-var formsObjectsLinksLength = 0;
+//var formsObjectsLinksLength = 0;
 var clickFlag = true;
 var clickSwitcher = 1;
+var selectedDomLayerNum = 1;
+var maxDomLayerNum = 0;
 
 chrome.browserAction.onClicked.addListener(function() {
     executeScript('console.log("プログラム開始");');
@@ -27,7 +30,7 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         clickSwitcher = 1;
         chrome.storage.local.get(formsObjects,function(items){
             executeScript('console.log('+JSON.stringify(items)+');');
-            formsObjectsLinksLength = items.links.length;
+            //formsObjectsLinksLength = items.links.length;
         });
         speechText_links(takeLinksList);
     }
@@ -35,7 +38,7 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         clickSwitcher = 2
         chrome.storage.local.get(hTagFormsObjects,function(items){
             executeScript('console.log('+JSON.stringify(items)+');');
-            formsObjectsLinksLength = items.links.length;
+            //formsObjectsLinksLength = items.links.length;
         });
         speechText_hTags(takeHTagList);
     }
@@ -43,7 +46,8 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         clickSwitcher = 3;
         chrome.storage.local.get(domSortFormsObjects,function(items){
             executeScript('console.log('+JSON.stringify(items)+');');
-            formsObjectsLinksLength = items.links.length;
+            //formsObjectsLinksLength = items.links.length;
+            maxDomLayerNum = items.maxDomLayer;
         });
         speechText_domSort(takeDomSortList);
     }
@@ -55,6 +59,12 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     }
     if(req.keycode == 90){//type 'Z'
         clickToLink();
+    }
+    if(req.keycode == 52){//type '4'
+        plusDomLayerNum();
+    }
+    if(req.keycode == 53){//type '5'
+        minusDomLayerNum();
     }
 });
 
@@ -76,6 +86,29 @@ function clickToLink(){
             clickFlag = true;
         };
     }
+}
+
+function plusDomLayerNum(){
+    if(selectedDomLayerNum < maxDomLayerNum) {
+        selectedDomLayerNum++;
+        executeScript('console.log("現在の階層は、' + selectedDomLayerNum + '番目です");');
+    }else{
+        executeScript('console.log("これ以上、深い階層はありません。");');
+    }
+
+    //音声案内も必要だろう。
+
+}
+
+function minusDomLayerNum(){
+    if(selectedDomLayerNum > 0) {
+        selectedDomLayerNum--;
+        executeScript('console.log("現在の階層は、' + selectedDomLayerNum + '番目です");');
+    }else{
+        executeScript('console.log("最浅層です。");');
+    }
+
+    //音声案内も
 }
 
 function nextLinkSelecting(){
@@ -128,9 +161,25 @@ function speechText_hTags(num){
         speechSynthesis.speak(msg);
     });
 }
+
+
+
+//発声させるためのキーボードキーを入れてない。
 function speechText_domSort(num){
     confirmStausOfSpeechsynthesis();
     chrome.storage.local.get(domSortFormsObjects,function(items){
+        for (var i = 0; i < items.length; i++){
+            if(items[i].key === selectedDomLayerNum){
+
+//
+//
+//ホワイトボード参照
+//
+//
+
+
+            }
+        }
     });
 }
 

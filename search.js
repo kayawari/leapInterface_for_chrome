@@ -2,8 +2,8 @@ $(function(){
     //はじめにフォームタグなどを削除
     removeInputTags();
     var linksArray      = removeSameLinkArray();
-    var imgAltArray     = removeImgNotAltArray(0);
-    var imgNotAltArray  = removeImgNotAltArray(1);
+    var imgAltArray     = removeImgNotAltArray()[0];
+    var imgNotAltArray  = removeImgNotAltArray()[1];
     var formObjects = {
         links       :linksArray,
         imgAlt      :imgAltArray,
@@ -24,10 +24,11 @@ $(function(){
     var topNode = $('body');
     var all_arr = extractDOMTree(topNode,1);
     var sortFormObject = {
-        DOMObjects : all_arr
+        DOMObjects : all_arr,
+        maxDomLayer: maxDom
     };
     chrome.storage.local.set(sortFormObject,function(){
-        console.log("%cset form objects with DOM to local storage !!","color:red");
+        console.log("%cset link objects with DOM to local storage !!","color:red;");
     });
 });
 
@@ -62,6 +63,17 @@ $(window).keydown(function(e){
     if(e.keyCode == 90){
         chrome.runtime.sendMessage({keycode:90},function(response){
             //console.log('type Z');
+        });
+    }
+
+    if(e.keyCode == 52){
+        chrome.runtime.sendMessage({keycode:52},function(response){
+            //console.log('type 4');
+        });
+    }
+    if(e.keyCode == 53){
+        chrome.runtime.sendMessage({keycode:53},function(response){
+            //console.log('type 5');
         });
     }
 });
@@ -179,6 +191,7 @@ function sortLinkByLengthOfTheSentence(processedList){
 }
 
 var all_arr = [];
+var maxDom = 0;//DOMの最深層の数を格納
 function extractDOMTree(nodeObject,layerNum){
     var temp_arr = [];
     var nodeObjectChildren = nodeObject.children();
@@ -204,6 +217,8 @@ function extractDOMTree(nodeObject,layerNum){
             extractDOMTree($(nodeObjectChildren[j]),layerNum + 1);
         }
     }
+    if(maxDom < layerNum) maxDom = layerNum;
+    //console.log(maxDom);
     return all_arr;
 }
 
