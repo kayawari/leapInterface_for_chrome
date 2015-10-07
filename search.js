@@ -23,12 +23,21 @@ $(function(){
 
     var topNode = $('body');
     var all_arr = extractDOMTree(topNode,1);
-    var sortFormObject = {
-        DOMObjects : all_arr,
+    var sortWithDomLayersArray = sortWithDomLayers(all_arr);
+    var sortWithDomLayersAndObjectsArray = sortWithDomLayersAndObjects(all_arr);
+    var sortFormObject_1 = {
+        DOMObjects : sortWithDomLayersArray,
         maxDomLayer: maxDom
     };
-    chrome.storage.local.set(sortFormObject,function(){
-        console.log("%cset link objects with DOM to local storage !!","color:red;");
+    var sortFormObject_2 = {
+        DOMObjects : sortWithDomLayersAndObjectsArray,
+        maxDomLayer: maxDom
+    };
+    chrome.storage.local.set(sortFormObject_1,function(){
+        console.log("%cset link objects 1 with DOM to local storage !!","color:red;");
+    });
+    chrome.storage.local.set(sortFormObject_2,function(){
+        console.log("%cset link objects 2 with DOM to local storage !!","color:pink;");
     });
 });
 
@@ -50,6 +59,21 @@ $(window).keydown(function(e){
             //console.log('type 3');
         });
     }
+    if(e.keyCode == 52){
+        chrome.runtime.sendMessage({keycode:52},function(response){
+            //console.log('type 4');
+        });
+    }
+    if(e.keyCode == 53){
+        chrome.runtime.sendMessage({keycode:53},function(response){
+            //console.log('type 5');
+        });
+    }
+    if(e.keyCode == 54){
+        chrome.runtime.sendMessage({keycode:54},function(response){
+            //console.log('type 6');
+        });
+    }
     if(e.keyCode == 69){
         chrome.runtime.sendMessage({keycode:69},function(response){
             //console.log('type E');
@@ -66,16 +90,6 @@ $(window).keydown(function(e){
         });
     }
 
-    if(e.keyCode == 52){
-        chrome.runtime.sendMessage({keycode:52},function(response){
-            //console.log('type 4');
-        });
-    }
-    if(e.keyCode == 53){
-        chrome.runtime.sendMessage({keycode:53},function(response){
-            //console.log('type 5');
-        });
-    }
 });
 
 function removeInputTags(){
@@ -219,7 +233,7 @@ function extractDOMTree(nodeObject,layerNum){
     }
     if(maxDom < layerNum) maxDom = layerNum;
     //console.log(maxDom);
-    return all_arr;
+    return divideObjectsWithDom(all_arr);
 }
 
 //ハッシュのkeyに変数を利用するための関数
@@ -228,4 +242,58 @@ function hash_key(key,value){
     var h = {};
     h[key] = value;
     return h;
+}
+
+//階層毎に分ける
+function divideObjectsWithDom(arr){
+    var arrLength = arr.length;
+    var tmp_all_arr = [];
+    for(var domNum = 1; domNum <= maxDom; domNum++){
+        var tmpArr = [];
+        for(var i=0;i<arrLength;i++){
+            for(key in arr[i]){
+                if(key == domNum){
+                    tmpArr.push(arr[i]);
+                }
+            }
+        }
+        tmp_all_arr.push(tmpArr);
+    }
+    return tmp_all_arr;
+}
+
+
+//ここがひどい.for文のネストがすごい事に.extractedDomTree()に盛り込めるはず。
+function sortWithDomLayers(arr){
+    var tmp_all_arr = [];
+    for(var i=0;i < arr.length; i++){
+        var tmpArr = [];
+        for(var j=0;j<arr[i].length;j++){
+            for(key in arr[i][j]){
+                for(var k=0; k<arr[i][j][key].length; k++){
+                    tmpArr.push(arr[i][j][key][k]);
+                }
+            }
+        }
+        sortLinkByLengthOfTheSentence(tmpArr);
+        tmp_all_arr.push(tmpArr);
+    }
+    return tmp_all_arr;
+}
+
+function sortWithDomLayersAndObjects(arr){
+    var tmp_all_arr = [];
+    for(var i=0;i < arr.length; i++){
+        var tmpArr = [];
+        for(var j=0;j<arr[i].length;j++){
+            for(key in arr[i][j]){
+                sortLinkByLengthOfTheSentence(arr[i][j][key]);
+                for(var k=0; k<arr[i][j][key].length; k++){
+                    tmpArr.push(arr[i][j][key][k]);
+                }
+            }
+        }
+        tmp_all_arr.push(tmpArr);
+    }
+    return tmp_all_arr;
 }

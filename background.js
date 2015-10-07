@@ -1,7 +1,8 @@
 //jquery 2.x.x not supporting IE 6,7,8
 var takeLinksList   = 0;
 var takeHTagList    = 0;
-var takeDomSortList = 0;
+var takeDomSortList_1 = 0;
+var takeDomSortList_2 = 0;
 var formsObjects = {
     links       :[],
     imgAlt      :[],
@@ -10,7 +11,11 @@ var formsObjects = {
 var hTagFormsObjects = {
     headTags    :[]
 };
-var domSortFormsObjects = {
+var domSortFormsObjects_1 = {
+    DOMObjects :[],
+    maxDomLayer:0
+};
+var domSortFormsObjects_2 = {
     DOMObjects :[],
     maxDomLayer:0
 };
@@ -44,13 +49,30 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     }
     if(req.keycode == 51){//type '3'
         clickSwitcher = 3;
-        chrome.storage.local.get(domSortFormsObjects,function(items){
+        chrome.storage.local.get(domSortFormsObjects_1,function(items){
             executeScript('console.log('+JSON.stringify(items)+');');
             //formsObjectsLinksLength = items.links.length;
             maxDomLayerNum = items.maxDomLayer;
         });
-        speechText_domSort(takeDomSortList);
+        speechText_domSort(takeDomSortList_1);
     }
+    if(req.keycode == 52){//type '4'
+        clickSwitcher = 4;
+        chrome.storage.local.get(domSortFormsObjects_2,function(items){
+            executeScript('console.log('+JSON.stringify(items)+');');
+            //formsObjectsLinksLength = items.links.length;
+            maxDomLayerNum = items.maxDomLayer;
+        });
+        speechText_domSort(takeDomSortList_2);
+    }
+    if(req.keycode == 53){//type '5'
+        minusDomLayerNum();
+    }
+    if(req.keycode == 54){//type '6'
+        plusDomLayerNum();
+    }
+
+
     if(req.keycode == 69){//type 'E'
         previousLinkSelecting();
     }
@@ -59,12 +81,6 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     }
     if(req.keycode == 90){//type 'Z'
         clickToLink();
-    }
-    if(req.keycode == 52){//type '4'
-        plusDomLayerNum();
-    }
-    if(req.keycode == 53){//type '5'
-        minusDomLayerNum();
     }
 });
 
@@ -101,7 +117,7 @@ function plusDomLayerNum(){
 }
 
 function minusDomLayerNum(){
-    if(selectedDomLayerNum > 0) {
+    if(selectedDomLayerNum > 1) {
         selectedDomLayerNum--;
         executeScript('console.log("現在の階層は、' + selectedDomLayerNum + '番目です");');
     }else{
@@ -118,7 +134,7 @@ function nextLinkSelecting(){
 
 function previousLinkSelecting(){
     executeScript('console.log("Refresh previous link.");');
-    if(takeLinksList > 0 || takeHTagList > 0 || takeDomSortList > 0){
+    if(takeLinksList > 0 || takeHTagList > 0 || takeDomSortList_1 > 0 || takeDomSortList_2 > 0){
         switchSpeechText(-1);
     }
 }
@@ -135,9 +151,14 @@ function switchSpeechText(num){
         takeHTagList = takeHTagList + num;
     }
     if(clickSwitcher === 3){
-        speechText_domSort(takeDomSortList);
+        speechText_domSort(takeDomSortList_1);
         //executeScript('console.log('+ clickSwitcher +');');
-        takeDomSortList = takeDomSortList + num;
+        takeDomSortList_1 = takeDomSortList_1 + num;
+    }
+    if(clickSwitcher === 4){
+        speechText_domSort(takeDomSortList_2);
+        //executeScript('console.log('+ clickSwitcher +');');
+        takeDomSortList_2 = takeDomSortList_2 + num;
     }
 }
 
@@ -151,6 +172,7 @@ function speechText_links(num){
         speechSynthesis.speak(msg);
     });
 }
+
 function speechText_hTags(num){
     confirmStausOfSpeechsynthesis();
     chrome.storage.local.get(hTagFormsObjects,function(items){
