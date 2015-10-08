@@ -39,6 +39,23 @@ $(function(){
     chrome.storage.local.set(sortFormObject_2,function(){
         console.log("%cset link objects 2 with DOM to local storage !!","color:pink;");
     });
+
+    var sortWithDomLayersObjects = extractObjectsFromArray(sortWithDomLayersArray);
+    var sortWithDomAndTagsObjects = extractObjectsFromArray(sortWithDomLayersAndObjectsArray);
+    var sortWithDom = {
+        sortWithDomObjects : sortWithDomLayersObjects,
+        tmpNum : 1
+    };
+    var sortWithDomAndTags = {
+        Num : 2,
+        sortWithDomAndTagsObjects : sortWithDomAndTagsObjects
+    };
+    chrome.storage.local.set(sortWithDom,function(){
+        console.log("%cset link Array with DOM to local storage !!","color:skyblue;");
+    });
+    chrome.storage.local.set(sortWithDomAndTags,function(){
+        console.log("%cset link Array with DOM to local storage !!","color:skyblue;");
+    });
 });
 
 $(window).keydown(function(e){
@@ -74,6 +91,17 @@ $(window).keydown(function(e){
             //console.log('type 6');
         });
     }
+    if(e.keyCode == 55){
+        chrome.runtime.sendMessage({keycode:55},function(response){
+            //console.log('type 7');
+        });
+    }
+    if(e.keyCode == 56){
+        chrome.runtime.sendMessage({keycode:56},function(response){
+            //console.log('type 8');
+        });
+    }
+
     if(e.keyCode == 69){
         chrome.runtime.sendMessage({keycode:69},function(response){
             //console.log('type E');
@@ -294,6 +322,16 @@ function sortWithDomLayersAndObjects(arr){
             }
         }
         tmp_all_arr.push(tmpArr);
+    }
+    return tmp_all_arr;
+}
+
+function extractObjectsFromArray(arr){
+    var tmp_all_arr = [];
+    for(var i=0;i<arr.length;i++){
+        for(var j=0;j<arr[i].length;j++){
+            tmp_all_arr.push(arr[i][j]);
+        }
     }
     return tmp_all_arr;
 }

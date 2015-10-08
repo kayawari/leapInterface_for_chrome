@@ -3,6 +3,8 @@ var takeLinksList   = 0;
 var takeHTagList    = 0;
 var takeDomSortList_1 = 0;
 var takeDomSortList_2 = 0;
+var takeSortList_1 =0;
+var takeSortList_2 =0;
 var formsObjects = {
     links       :[],
     imgAlt      :[],
@@ -19,6 +21,17 @@ var domSortFormsObjects_2 = {
     DOMObjects :[],
     maxDomLayer:0
 };
+
+//下二つのオブジェクト。なぜか形式を変えないと上書きされてしまうので、tmpNum,Numを無理やり追加
+var sortWithDom = {
+    sortWithDomObjects : [],
+    tmpNum : 0
+};
+var sortWithDomAndTags = {
+    Num : 0,
+    sortWithDomAndTagsObjects : []
+};
+
 //var formsObjectsLinksLength = 0;
 var clickFlag = true;
 var clickSwitcher = 1;
@@ -66,9 +79,23 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         speechText_domSort(takeDomSortList_2);
     }
     if(req.keycode == 53){//type '5'
-        minusDomLayerNum();
+        clickSwitcher = 5;
+        chrome.storage.local.get(sortWithDom,function(items){
+            executeScript('console.log('+JSON.stringify(items.sortWithDomObjects)+');');
+        });
+        speechText_domSort(takeSortList_1);
     }
     if(req.keycode == 54){//type '6'
+        clickSwitcher = 6;
+        chrome.storage.local.get(sortWithDomAndTags,function(items){
+            executeScript('console.log('+JSON.stringify(items.sortWithDomAndTagsObjects)+');');
+        });
+        speechText_domSort(takeSortList_2);
+    }
+    if(req.keycode == 55){//type '7'
+        minusDomLayerNum();
+    }
+    if(req.keycode == 56){//type '8'
         plusDomLayerNum();
     }
 
@@ -159,6 +186,16 @@ function switchSpeechText(num){
         speechText_domSort(takeDomSortList_2);
         //executeScript('console.log('+ clickSwitcher +');');
         takeDomSortList_2 = takeDomSortList_2 + num;
+    }
+    if(clickSwitcher === 5){
+        speechText_domSort(takeSortList_1);
+        //executeScript('console.log('+ clickSwitcher +');');
+        takeSortList_1 = takeSortList_1 + num;
+    }
+    if(clickSwitcher === 6){
+        speechText_domSort(takeSortList_2);
+        //executeScript('console.log('+ clickSwitcher +');');
+        takeSortList_1 = takeSortList_2 + num;
     }
 }
 
