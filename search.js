@@ -51,7 +51,7 @@ $(function(){
         sortWithDomAndTagsObjects : sortWithDomAndTagsObjects
     };
     chrome.storage.local.set(sortWithDom,function(){
-        console.log("%cset link Array with DOM to local storage !!","color:skyblue;");
+        console.log("%cset link Array with DOM to local storage !!","color:yellow;");
     });
     chrome.storage.local.set(sortWithDomAndTags,function(){
         console.log("%cset link Array with DOM to local storage !!","color:skyblue;");

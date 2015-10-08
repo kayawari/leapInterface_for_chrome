@@ -93,10 +93,18 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         speechText_domSort(takeSortList_2);
     }
     if(req.keycode == 55){//type '7'
-        minusDomLayerNum();
+        if(clickSwitcher == 3 || clickSwitcher == 4){
+            minusDomLayerNum();
+        }else{
+            executeScript('console.log("DOM選択モードになっていません。");');
+        }
     }
     if(req.keycode == 56){//type '8'
-        plusDomLayerNum();
+        if(clickSwitcher == 3 || clickSwitcher == 4){
+            plusDomLayerNum();
+        }else{
+            executeScript('console.log("DOM選択モードになっていません。");');
+        }
     }
 
 
@@ -144,7 +152,7 @@ function plusDomLayerNum(){
 }
 
 function minusDomLayerNum(){
-    if(selectedDomLayerNum > 1) {
+    if(selectedDomLayerNum > 0) {
         selectedDomLayerNum--;
         executeScript('console.log("現在の階層は、' + selectedDomLayerNum + '番目です");');
     }else{
@@ -161,7 +169,7 @@ function nextLinkSelecting(){
 
 function previousLinkSelecting(){
     executeScript('console.log("Refresh previous link.");');
-    if(takeLinksList > 0 || takeHTagList > 0 || takeDomSortList_1 > 0 || takeDomSortList_2 > 0){
+    if(takeLinksList > 0 || takeHTagList > 0 || takeDomSortList_1 > 0 || takeDomSortList_2 > 0 || takeSortList_1 > 0 || takeSortList_2 > 0){
         switchSpeechText(-1);
     }
 }
@@ -169,33 +177,27 @@ function previousLinkSelecting(){
 function switchSpeechText(num){
     if(clickSwitcher === 1) {
         speechText_links(takeLinksList);
-        //executeScript('console.log('+ clickSwitcher +');');
         takeLinksList = takeLinksList + num;
     }
     if(clickSwitcher === 2) {
         speechText_hTags(takeHTagList);
-        //executeScript('console.log('+ clickSwitcher +');');
         takeHTagList = takeHTagList + num;
     }
     if(clickSwitcher === 3){
-        speechText_domSort(takeDomSortList_1);
-        //executeScript('console.log('+ clickSwitcher +');');
+        speechText_domSort_1(takeDomSortList_1);
         takeDomSortList_1 = takeDomSortList_1 + num;
     }
     if(clickSwitcher === 4){
-        speechText_domSort(takeDomSortList_2);
-        //executeScript('console.log('+ clickSwitcher +');');
+        speechText_domSort_2(takeDomSortList_2);
         takeDomSortList_2 = takeDomSortList_2 + num;
     }
     if(clickSwitcher === 5){
-        speechText_domSort(takeSortList_1);
-        //executeScript('console.log('+ clickSwitcher +');');
+        speechText_sortLinks_1(takeSortList_1);
         takeSortList_1 = takeSortList_1 + num;
     }
     if(clickSwitcher === 6){
-        speechText_domSort(takeSortList_2);
-        //executeScript('console.log('+ clickSwitcher +');');
-        takeSortList_1 = takeSortList_2 + num;
+        speechText_sortLinks_2(takeSortList_2);
+        takeSortList_2 = takeSortList_2 + num;
     }
 }
 
@@ -221,24 +223,48 @@ function speechText_hTags(num){
     });
 }
 
+function speechText_sortLinks_1(num){
+    confirmStausOfSpeechsynthesis();
+    chrome.storage.local.get(sortWithDom,function(items){
+        var msg = new SpeechSynthesisUtterance(items.sortWithDomObjects[num].text.toString());
+        msg.text = items.sortWithDomObjects[num].text.toString();
+        executeScript('console.log("' + msg.text + '");');
+        msg.lang = 'ja-JP';
+        speechSynthesis.speak(msg);
+    });
+}
 
+function speechText_sortLinks_2(num){
+    confirmStausOfSpeechsynthesis();
+    chrome.storage.local.get(sortWithDomAndTags,function(items){
+        var msg = new SpeechSynthesisUtterance(items.sortWithDomAndTagsObjects[num].text.toString());
+        msg.text = items.sortWithDomAndTagsObjects[num].text.toString();
+        executeScript('console.log("' + msg.text + '");');
+        msg.lang = 'ja-JP';
+        speechSynthesis.speak(msg);
+    });
+}
 
 //発声させるためのキーボードキーを入れてない。
-function speechText_domSort(num){
+function speechText_domSort_1(num){
     confirmStausOfSpeechsynthesis();
-    chrome.storage.local.get(domSortFormsObjects,function(items){
-        for (var i = 0; i < items.length; i++){
-            if(items[i].key === selectedDomLayerNum){
+    chrome.storage.local.get(domSortFormsObjects_1,function(items){
+        var msg = new SpeechSynthesisUtterance(items.DOMObjects[selectedDomLayerNum][num].text.toString());
+        msg.text = items.DOMObjects[selectedDomLayerNum][num].text.toString();
+        executeScript('console.log("' + msg.text + '");');
+        msg.lang = 'ja-JP';
+        speechSynthesis.speak(msg);
+    });
+}
 
-//
-//
-//ホワイトボード参照
-//
-//
-
-
-            }
-        }
+function speechText_domSort_2(num){
+    confirmStausOfSpeechsynthesis();
+    chrome.storage.local.get(domSortFormsObjects_2,function(items){
+        var msg = new SpeechSynthesisUtterance(items.DOMObjects[selectedDomLayerNum][num].text.toString());
+        msg.text = items.DOMObjects[selectedDomLayerNum][num].text.toString();
+        executeScript('console.log("' + msg.text + '");');
+        msg.lang = 'ja-JP';
+        speechSynthesis.speak(msg);
     });
 }
 
