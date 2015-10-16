@@ -5,10 +5,9 @@ var takeDomSortList_1 = 0;
 var takeDomSortList_2 = 0;
 var takeSortList_1 = 0;
 var takeSortList_2 = 0;
+
 var formsObjects = {
-    links       :[],
-    imgAlt      :[],
-    imgNotAlt   :[]
+    links       :[]
 };
 var hTagFormsObjects = {
     headTags    :[]

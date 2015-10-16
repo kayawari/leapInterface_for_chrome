@@ -2,12 +2,8 @@ $(function(){
     //はじめにフォームタグなどを削除
     removeInputTags();
     var linksArray      = removeSameLinkArray();
-    var imgAltArray     = removeImgNotAltArray()[0];
-    var imgNotAltArray  = removeImgNotAltArray()[1];
     var formObjects = {
-        links       :linksArray,
-        imgAlt      :imgAltArray,
-        imgNotAlt   :imgNotAltArray,
+        links       :linksArray
     };
     chrome.storage.local.set(formObjects,function(){
         console.log("%cset form objects to local storage !!","color:green;");
@@ -155,33 +151,6 @@ function removeSameLinkArray(){
     }
 
     return sortLinkByLengthOfTheSentence(linkList);
-}
-
-function removeImgNotAltArray(){
-    var imgAltLink      = [],
-        imgNotAltLink   = [];
-    $('a > img').each(function(){
-        if( $(this).attr('alt') !== undefined ){
-            imgAltLink.push({
-                'uri'   :$(this).attr('href'),
-                'text'  :$(this).attr('alt')
-            });
-        } else {
-            imgNotAltLink.push( $(this).attr('href') );
-        }
-    });
-   
-    //uriが重複する要素を削除
-    var arrObj = {};
-    for(var i=0; i<imgAltLink.length; i++){
-        arrObj[imgAltLink[i]['uri']] = imgAltLink[i];
-    }
-    imgAltLink = [];
-    for(var key in arrObj){
-        imgAltLink.push(arrObj[key]);
-    }
-
-    return imgAltLink,imgNotAltLink;
 }
 
 function extractHeadTagsArray(){
