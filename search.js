@@ -333,5 +333,12 @@ function extractObjectsFromArray(arr){
             tmp_all_arr.push(arr[i][j]);
         }
     }
+    
+    for(var i=0; i<tmp_all_arr.length; i++){
+        if(!tmp_all_arr[i].text || tmp_all_arr[i].text === null || tmp_all_arr[i].text === undefined || tmp_all_arr[i].text.length == 0 || tmp_all_arr[i].text === ""){
+            tmp_all_arr.splice(i,1);
+            i--;
+        }
+    }
     return tmp_all_arr;
 }
