@@ -85,19 +85,19 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     }
     if(req.keycode == 53){//type '5'
         clickSwitcher = 5;
-        takeSortList_1 = 0;
+        takeDomSortList_1 = 0;
         chrome.storage.local.get(sortWithDom,function(items){
             executeScript('console.log('+JSON.stringify(items.sortWithDomObjects)+');');
         });
-        speechText_sortLinks_1(takeSortList_1);
+        speechText_sortLinks_1(takeDomSortList_1);
     }
     if(req.keycode == 54){//type '6'
         clickSwitcher = 6;
-        takeSortList_2 = 0;
+        takeDomSortList_2 = 0;
         chrome.storage.local.get(sortWithDomAndTags,function(items){
             executeScript('console.log('+JSON.stringify(items.sortWithDomAndTagsObjects)+');');
         });
-        speechText_sortLinks_2(takeSortList_2);
+        speechText_sortLinks_2(takeDomSortList_2);
     }
     if(req.keycode == 55){//type '7'
         if(clickSwitcher == 3 || clickSwitcher == 4){
@@ -129,26 +129,6 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         //これがまだできてない。
     }
 });
-
-function clickToLink(){
-    if(clickSwitcher != 1) return 0;
-    if(clickFlag){
-        clickFlag = false;
-        var clickedURINumber = takeLinksList;
-        var speechText = new SpeechSynthesisUtterance();
-        speechText.lang = 'JP-ja';
-        chrome.storage.local.get(formsObjects,function(items){
-            var clickedURIText  = items.links[clickedURINumber].text;
-            var clickedURI      = items.links[clickedURINumber].uri;
-            speechText.text = clickedURIText.toString();
-            speechSynthesis.speak(speechText);
-            executeScript('location.href="' + clickedURI.toString() + '";');
-        });
-        speechText.onend = function(e){
-            clickFlag = true;
-        };
-    }
-}
 
 function plusDomLayerNum(){
     takeDomSortList_1 = 0;
