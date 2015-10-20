@@ -130,6 +130,74 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     }
 });
 
+function clickToLink(){
+    if(clickSwitcher == 2) return 0;
+    if(clickFlag){
+       clickFlag = false;
+       var speechText = new SpeechSynthesisUtterance();
+       speechText.lang = 'JP-ja';
+
+       if(clickSwitcher == 1){
+                 var clickedURINumber = takeLinksList;
+                 chrome.storage.local.get(formsObjects,function(items){
+                    var clickedURIText  = items.links[clickedURINumber].text;
+                    var clickedURI      = items.links[clickedURINumber].uri;
+                    speechText.text = clickedURIText.toString();
+                    speechSynthesis.speak(speechText);
+                    executeScript('location.href="' + clickedURI.toString() + '";');
+                 });
+        }
+       if(clickSwitcher == 3){
+                 var clickedURINumber = takeSortList_1;
+                 chrome.storage.local.get(takeSortList_1,function(items){
+                    var clickedURIText  = items.DOMObjects[selectedDomLayerNum][clickedURINumber].text;
+                    var clickedURI      = items.DOMObjects[selectedDomLayerNum][clickedURINumber].uri;
+                    speechText.text = clickedURIText.toString();
+                    speechSynthesis.speak(speechText);
+                    executeScript('location.href="' + clickedURI.toString() + '";');
+                 });
+        }
+
+         if(clickSwitcher == 4){
+                 var clickedURINumber = takeSortList_2;
+                 chrome.storage.local.get(takeSortList_2,function(items){
+                    var clickedURIText  = items.DOMObjects[selectedDomLayerNum][clickedURINumber].text;
+                    var clickedURI      = items.DOMObjects[selectedDomLayerNum][clickedURINumber].uri;
+                    speechText.text = clickedURIText.toString();
+                    speechSynthesis.speak(speechText);
+                    executeScript('location.href="' + clickedURI.toString() + '";');
+                 });
+         }
+
+         if(clickSwitcher == 5){
+                 var clickedURINumber = takeDomSortList_1;
+                 chrome.storage.local.get(takeDomSortList_1,function(items){
+                    var clickedURIText  = items.sortWithDomObjects[selectedDomLayerNum][clickedURINumber].text;
+                    var clickedURI      = items.sortWithDomObjects[selectedDomLayerNum][clickedURINumber].uri;
+                    speechText.text = clickedURIText.toString();
+                    speechSynthesis.speak(speechText);
+                    executeScript('location.href="' + clickedURI.toString() + '";');
+                 });
+         }
+         if(clickSwitcher == 6){
+                 var clickedURINumber = takeDomSortList_2;
+                 chrome.storage.local.get(takeDomSortList_2,function(items){
+                    var clickedURIText  = items.sortWithDomAndTagsObjects[selectedDomLayerNum][clickedURINumber].text;
+                    var clickedURI      = items.sortWithDomAndTagsObjects[selectedDomLayerNum][clickedURINumber].uri;
+                    speechText.text = clickedURIText.toString();
+                    speechSynthesis.speak(speechText);
+                    executeScript('location.href="' + clickedURI.toString() + '";');
+                 });
+        }
+
+        speechText.onend = function(e){
+            clickFlag = true;
+        };
+
+    }
+
+}
+
 function plusDomLayerNum(){
     takeDomSortList_1 = 0;
     takeDomSortList_2 = 0;
