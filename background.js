@@ -74,17 +74,21 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         speechText_normal(maxDomLayerNum + '階層あります。');
     }
     if(req.keycode == 52){//type '4'
-        clickSwitcher = 4;
-        takeDomSortList_2 = 0;
+        clickSwitcher       = 4;
+        //クリックされたキーを識別する変数
+        takeDomSortList_2   = 0;
+        //階層内のリンクを選ぶ変数をキーを押した段階でリセット
         selectedDomLayerNum = 0;
+        //dom階層選択変数
         chrome.storage.local.get(domSortFormsObjects_2,function(items){
             executeScript('console.log('+JSON.stringify(items)+');');
-            //formsObjectsLinksLength = items.links.length;
             maxDomLayerNum = items.maxDomLayer;
+            //DOM階層の最大値を格納
         })
         speechText_normal('階層を選択してください。');
         speechText_normal(maxDomLayerNum + '階層あります。');
     }
+
     if(req.keycode == 53){//type '5'
         clickSwitcher = 5;
         takeDomSortList_1 = 0;
@@ -149,6 +153,7 @@ function clickToLink(){
                     executeScript('location.href="' + clickedURI.toString() + '";');
                  });
         }
+ 
        if(clickSwitcher == 3){
                  var clickedURINumber = takeSortList_1;
                  chrome.storage.local.get(takeSortList_1,function(items){
@@ -257,6 +262,7 @@ function speechText_normal(str){
 
 function speechText_links(selectNum){
     confirmStausOfSpeechsynthesis();
+
     chrome.storage.local.get(formsObjects,function(items){
         if(takeLinksList < items.links.length && takeLinksList >= 0){
             takeLinksList = takeLinksList + selectNum;
@@ -344,25 +350,34 @@ function speechText_domSort_1(selectNum){
     });
 }
 
+var speech_flag = true;
 function speechText_domSort_2(selectNum){
-    confirmStausOfSpeechsynthesis();
-    chrome.storage.local.get(domSortFormsObjects_2,function(items){
-        if(items.DOMObjects[selectedDomLayerNum].length == 0){
-            speechText_normal('この階層にリンクはありません');
-            return;
-        }
-        if(takeSortList_2 < items.DOMObjects[selectedDomLayerNum].length && takeSortList_2 >= 0){
-            takeSortList_2 = takeSortList_2 + selectNum;
-        } else {
-            executeScript('console.log("'+takeSortList_2+'")');
-            takeSortList_2--;
-        }
-        var msg = new SpeechSynthesisUtterance();
-        msg.text = items.DOMObjects[selectedDomLayerNum][takeSortList_2].text.toString();
-        executeScript('console.log("' + msg.text + '");');
-        msg.lang = 'ja-JP';
-        speechSynthesis.speak(msg);
-    });
+	confirmStausOfSpeechsynthesis();
+	if(speech_flag){
+		speech_flag = false;
+		chrome.storage.local.get(domSortFormsObjects_2,function(items){
+			if(items.DOMObjects[selectedDomLayerNum].length == 0){
+				speechText_normal('この階層にリンクはありません');
+                speech_flag = true;
+				return;
+			}
+			if(takeSortList_2 < items.DOMObjects[selectedDomLayerNum].length && takeSortList_2 >= 0){
+				takeSortList_2 = takeSortList_2 + selectNum;
+			} else {
+				executeScript('console.log("'+takeSortList_2+'")');
+				takeSortList_2--;
+			}
+			var msg = new SpeechSynthesisUtterance();
+			msg.text = items.DOMObjects[selectedDomLayerNum][takeSortList_2].text.toString();
+			executeScript('console.log("' + msg.text + '");');
+			msg.lang = 'ja-JP';
+			speechSynthesis.speak(msg);
+
+			msg.onend = function(e){
+				speech_flag= true;
+			};
+		});
+	}
 }
 
 function confirmStausOfSpeechsynthesis(){
