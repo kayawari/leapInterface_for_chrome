@@ -71,6 +71,7 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
             maxDomLayerNum = items.maxDomLayer;
         });
         speechText_normal('階層を選択してください。');
+        speechText_normal(maxDomLayerNum + '階層あります。');
     }
     if(req.keycode == 52){//type '4'
         clickSwitcher = 4;
@@ -82,6 +83,7 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
             maxDomLayerNum = items.maxDomLayer;
         })
         speechText_normal('階層を選択してください。');
+        speechText_normal(maxDomLayerNum + '階層あります。');
     }
     if(req.keycode == 53){//type '5'
         clickSwitcher = 5;
