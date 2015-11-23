@@ -46,6 +46,11 @@ $(window).keydown(function(e){
             //console.log('type R');
         });
 	}
+	if(e.keyCode == 84){
+		chrome.runtime.sendMessage({keycode:84},function(response){
+            //console.log('type T');
+        });
+	}
 	if(e.keyCode == 90){
 		chrome.runtime.sendMessage({keycode:90},function(response){
             //console.log('type Z');

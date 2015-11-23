@@ -12,14 +12,14 @@ var sortWithDomAndTags = {
 	sortWithDomAndTagsObjects : []
 };
 
-var clickFlag = true;
-
 //クリックされたキーを識別する変数
 var clickSwitcher = 1;
 //dom階層選択変数
 var selectedDomLayerNum = 1;
 //取得階層の最大値
 var maxDomLayerNum;
+var speech_flag = true;
+var click_flag = true;
 
 chrome.browserAction.onClicked.addListener(function() {
 	executeScript('console.log("プログラム開始");');
@@ -66,10 +66,13 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     }
     if(req.keycode == 69){//type 'E'
     	previousLinkSelecting();
-}
+    }
     if(req.keycode == 82){//type 'R'
     	nextLinkSelecting();
-}
+    }
+    if(req.keycode == 84){//type 'T'
+    	nowLinkSelecting();
+    }
     if(req.keycode == 90){//type 'Z'
     	clickToLink();
 
@@ -78,34 +81,58 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
 });
 
 function plusDomLayerNum(){
-	takeSortList_2 = 0;
-	if(selectedDomLayerNum < maxDomLayerNum) {
-		selectedDomLayerNum++;
-		speechText_normal('現在の階層は'+selectedDomLayerNum+'番目です');
-	}else{
-		speechText_normal('これ以上、深い階層はありません。');
-	}
+	if(click_flag){
+        click_flag = false;
+        if(selectedDomLayerNum < maxDomLayerNum) {
+		    selectedDomLayerNum++;
+    	    takeSortList_2 = 0;
+	    	speechText_normal('階層'+selectedDomLayerNum+'番目');
+    	}else{
+	    	speechText_normal('これ以上、深い階層はありません。');
+	    }
+        click_flag = true;
+    }
 }
 
 function minusDomLayerNum(){
-	takeSortList_2 = 0;
-	if(selectedDomLayerNum > 0) {
-		selectedDomLayerNum--;
-		speechText_normal('現在の階層は'+selectedDomLayerNum+'番目です');
-	}else{
-		speechText_normal('一番浅い階層です。');
-	}
+	if(click_flag){
+        click_flag = false;
+    	if(selectedDomLayerNum > 0) {
+	    	selectedDomLayerNum--;
+	        takeSortList_2 = 0;
+    		speechText_normal('階層'+selectedDomLayerNum+'番目');
+	    }else{
+		    speechText_normal('一番浅い階層です。');
+	    }
+        click_flag = true;
+    }
 }
 
 function nextLinkSelecting(){
-    //executeScript('console.log("next link or text.");');
-    switchSpeechText(1);
+	if(click_flag){
+        click_flag = false;
+        switchSpeechText(1);
+        click_flag = true;
+    }
 }
 
 function previousLinkSelecting(){
-    //executeScript('console.log("previous link or text.");');
-    if( takeDomSortList_2 > 0 || takeSortList_2 > 0 ){
-    	switchSpeechText(-1);
+	if(click_flag){
+        click_flag = false;
+        if( takeDomSortList_2 > 0 || takeSortList_2 > 0 ){
+        	switchSpeechText(-1);
+        }
+        click_flag = true;
+    }
+}
+
+function nowLinkSelecting(){
+	if(click_flag){
+        click_flag = false;
+        if( takeDomSortList_2 > 0 || takeSortList_2 > 0 ){
+        	switchSpeechText(0);
+        }
+        click_flag = true;
     }
 }
 
@@ -116,14 +143,19 @@ function switchSpeechText(selectNum){
 }
 
 function speechText_normal(str){
-	var msg = new SpeechSynthesisUtterance();
-	msg.text = str;
-	msg.lang = 'ja-JP';
-	executeScript('console.log("' + msg.text + '");');
-	speechSynthesis.speak(msg);
+    if(speech_flag){
+		speech_flag = false;
+        var msg = new SpeechSynthesisUtterance();
+        msg.text = str;
+        msg.lang = 'ja-JP';
+        executeScript('console.log("' + msg.text + '");');
+        speechSynthesis.speak(msg);
+        msg.onend = function(e){
+			speech_flag= true;
+		};
+    }
 }
 
-var speech_flag = true;
 function speechText_sortLinks_2(selectNum){
 	confirmStausOfSpeechsynthesis();
 	if(speech_flag){
