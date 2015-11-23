@@ -20,11 +20,6 @@ $(window).keydown(function(e){
            //console.log('type 1');
        });
 	}
-	if(e.keyCode == 50){
-		chrome.runtime.sendMessage({keycode:50},function(response){
-            //console.log('type 2');
-        });
-	}
 	if(e.keyCode == 51){
 		chrome.runtime.sendMessage({keycode:51},function(response){
             //console.log('type 3');

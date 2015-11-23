@@ -40,14 +40,6 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
             speechText_normal('全部で' + maxDomLayerNum + '階層あります。');
         })
     }
-    if(req.keycode == 50){//type '2'
-    	clickSwitcher = 2;
-    takeDomSortList_2 = 0;
-    chrome.storage.local.get(sortWithDomAndTags,function(items){
-    	executeScript('console.log('+JSON.stringify(items.sortWithDomAndTagsObjects)+');');
-    });
-    speechText_sortLinks_2(takeDomSortList_2);
-}
     if(req.keycode == 51){//type '3'
     	if(clickSwitcher == 1){
     		minusDomLayerNum();
