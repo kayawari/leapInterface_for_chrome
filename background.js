@@ -73,14 +73,29 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
 function plusDomLayerNum(){
 	if(click_flag){
         click_flag = false;
-        if(selectedDomLayerNum < maxDomLayerNum) {
+        if(selectedDomLayerNum < maxDomLayerNum-1) {
 		    selectedDomLayerNum++;
     	    takeSortList_2 = 0;
-	    	speechText_normal('階層'+selectedDomLayerNum+'番目');
+	    
+            var msg = new SpeechSynthesisUtterance();
+            var layerNum = selectedDomLayerNum + 1;
+            msg.text = '階層' + layerNum  + '番目';
+            msg.lang = 'ja-JP';
+            speechSynthesis.speak(msg);
+            executeScript('console.log("' + msg.text + '");');
+            msg.onend = function(e){
+                click_flag = true;
+            };
     	}else{
-	    	speechText_normal('これ以上、深い階層はありません。');
+            var msg = new SpeechSynthesisUtterance();
+            msg.text = 'これ以上深い階層はないです';
+            msg.lang = 'ja-JP';
+            speechSynthesis.speak(msg);
+            executeScript('console.log("' + msg.text + '");');
+            msg.onend = function(e){
+                click_flag = true;
+            };
 	    }
-        click_flag = true;
     }
 }
 
@@ -90,11 +105,27 @@ function minusDomLayerNum(){
     	if(selectedDomLayerNum > 0) {
 	    	selectedDomLayerNum--;
 	        takeSortList_2 = 0;
-    		speechText_normal('階層'+selectedDomLayerNum+'番目');
+			
+            var msg = new SpeechSynthesisUtterance();
+            var layerNum = selectedDomLayerNum + 1;
+            msg.text = '階層' + layerNum  + '番目';
+            msg.lang = 'ja-JP';
+            speechSynthesis.speak(msg);
+            executeScript('console.log("' + msg.text + '");');
+            msg.onend = function(e){
+                click_flag = true;
+            };
 	    }else{
-		    speechText_normal('一番浅い階層です。');
+            var msg = new SpeechSynthesisUtterance();
+            var layerNum = selectedDomLayerNum + 1;
+            msg.text = '階層' + layerNum  + '番目';
+            msg.lang = 'ja-JP';
+            speechSynthesis.speak(msg);
+            executeScript('console.log("' + msg.text + '");');
+            msg.onend = function(e){
+                click_flag = true;
+            };
 	    }
-        click_flag = true;
     }
 }
 
@@ -152,7 +183,7 @@ function speechText_domSort_2(selectNum){
 	if(flag){
 		flag = false;
 		chrome.storage.local.get(domSortFormsObjects_2,function(items){
-			if(items.DOMObjects[selectedDomLayerNum].length == 0){
+			if(items.DOMObjects[selectedDomLayerNum].length === 0){
 				speechText_normal('この階層にリンクはありません');
 				flag = true;
 				return;
