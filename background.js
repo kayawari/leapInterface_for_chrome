@@ -14,7 +14,7 @@ var sortWithDomAndTags = {
 //クリックされたキーを識別する変数
 var clickSwitcher = 1;
 //dom階層選択変数
-var selectedDomLayerNum = 1;
+var selectedDomLayerNum = 0;
 //取得階層の最大値
 var maxDomLayerNum;
 var speech_flag = true;
