@@ -1,5 +1,4 @@
 //jquery 2.x.x not supporting IE 6,7,8
-var takeDomSortList_2 = 0;
 var takeSortList_2 = 0;
 
 //chrome.local.storageのJSONフォーマット
@@ -29,7 +28,7 @@ chrome.browserAction.onClicked.addListener(function() {
 chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
     if(req.keycode == 49){//type '1'
     	clickSwitcher       = 1;
-    takeDomSortList_2   = 0;
+        takeSortList_2   = 0;
         //階層内のリンクを選ぶ変数をキーを押した段階でリセット
         selectedDomLayerNum = 0;
         chrome.storage.local.get(domSortFormsObjects_2,function(items){
@@ -110,7 +109,7 @@ function nextLinkSelecting(){
 function previousLinkSelecting(){
 	if(click_flag){
         click_flag = false;
-        if( takeDomSortList_2 > 0 || takeSortList_2 > 0 ){
+        if( takeSortList_2 > 0 ){
         	switchSpeechText(-1);
         }
         click_flag = true;
@@ -120,7 +119,7 @@ function previousLinkSelecting(){
 function nowLinkSelecting(){
 	if(click_flag){
         click_flag = false;
-        if( takeDomSortList_2 > 0 || takeSortList_2 > 0 ){
+        if( takeSortList_2 > 0 ){
         	switchSpeechText(0);
         }
         click_flag = true;
@@ -145,30 +144,6 @@ function speechText_normal(str){
 			speech_flag= true;
 		};
     }
-}
-
-function speechText_sortLinks_2(selectNum){
-	confirmStausOfSpeechsynthesis();
-	if(speech_flag){
-		speech_flag = false;
-		chrome.storage.local.get(sortWithDomAndTags,function(items){
-			if(takeDomSortList_2 < items.sortWithDomAndTagsObjects.length && takeDomSortList_2 >= 0){
-				takeDomSortList_2 = takeDomSortList_2 + selectNum;
-			} else {
-				executeScript('console.log("'+takeDomSortList_2+'")');
-				takeDomSortList_2--;
-			}
-			var msg = new SpeechSynthesisUtterance();
-			msg.text = items.sortWithDomAndTagsObjects[takeDomSortList_2].text.toString();
-			executeScript('console.log("' + msg.text + '");');
-			msg.lang = 'ja-JP';
-			speechSynthesis.speak(msg);
-
-            msg.onend = function(e){
-				speech_flag= true;
-			};
-		});
-	}
 }
 
 var flag = true;
