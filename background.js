@@ -36,7 +36,6 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
         	executeScript('console.log('+JSON.stringify(items)+');');
             //DOM階層の最大値を格納
         	maxDomLayerNum = items.maxDomLayer;
-            speechText_normal('階層を選択してください。');
             speechText_normal('全部で' + maxDomLayerNum + '階層あります。');
         })
     }
@@ -172,31 +171,35 @@ function speechText_sortLinks_2(selectNum){
 	}
 }
 
+var flag = true;
 function speechText_domSort_2(selectNum){
 	confirmStausOfSpeechsynthesis();
-	if(speech_flag){
-		speech_flag = false;
+	if(flag){
+		flag = false;
 		chrome.storage.local.get(domSortFormsObjects_2,function(items){
 			if(items.DOMObjects[selectedDomLayerNum].length == 0){
 				speechText_normal('この階層にリンクはありません');
-				speech_flag = true;
+				flag = true;
 				return;
 			}
-			if(takeSortList_2 < items.DOMObjects[selectedDomLayerNum].length && takeSortList_2 >= 0){
-				takeSortList_2 = takeSortList_2 + selectNum;
-			} else {
-				executeScript('console.log("'+takeSortList_2+'")');
-				takeSortList_2--;
-			}
-			var msg = new SpeechSynthesisUtterance();
-			msg.text = items.DOMObjects[selectedDomLayerNum][takeSortList_2].text.toString();
-			executeScript('console.log("' + msg.text + '");');
-			msg.lang = 'ja-JP';
-			speechSynthesis.speak(msg);
+			
+            takeSortList_2 = takeSortList_2 + selectNum;
+			
+            if(0 <= takeSortList_2 && takeSortList_2 < items.DOMObjects[selectedDomLayerNum].length){
+			    var msg = new SpeechSynthesisUtterance();
+                msg.text = items.DOMObjects[selectedDomLayerNum][takeSortList_2].text.toString();
+                executeScript('console.log("' + msg.text + '");');
+                msg.lang = 'ja-JP';
+                speechSynthesis.speak(msg);
 
-			msg.onend = function(e){
-				speech_flag= true;
-			};
+                msg.onend = function(e){
+                    flag= true;
+                };
+            } else {
+				speechText_normal('キーワードなし');
+                takeSortList_2--;
+                flag = true;
+			}
 		});
 	}
 }
