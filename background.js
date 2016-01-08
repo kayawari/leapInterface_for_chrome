@@ -36,7 +36,7 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
             //DOM階層の最大値を格納
         	maxDomLayerNum = items.maxDomLayer;
             speechText_normal('全部で' + maxDomLayerNum + '階層あります。');
-        })
+        });
     }
     if(req.keycode == 51){//type '3'
     	if(clickSwitcher == 1){
@@ -73,11 +73,11 @@ chrome.runtime.onMessage.addListener(function(req,sen,sendRes){
 function plusDomLayerNum(){
 	if(click_flag){
         click_flag = false;
+        var msg = new SpeechSynthesisUtterance();
         if(selectedDomLayerNum < maxDomLayerNum-1) {
 		    selectedDomLayerNum++;
     	    takeSortList_2 = 0;
 	    
-            var msg = new SpeechSynthesisUtterance();
             var layerNum = selectedDomLayerNum + 1;
             msg.text = '階層' + layerNum  + '番目';
             msg.lang = 'ja-JP';
@@ -87,7 +87,6 @@ function plusDomLayerNum(){
                 click_flag = true;
             };
     	}else{
-            var msg = new SpeechSynthesisUtterance();
             msg.text = 'これ以上深い階層はないです';
             msg.lang = 'ja-JP';
             speechSynthesis.speak(msg);
@@ -102,12 +101,12 @@ function plusDomLayerNum(){
 function minusDomLayerNum(){
 	if(click_flag){
         click_flag = false;
+        var msg = new SpeechSynthesisUtterance();
+        var layerNum = selectedDomLayerNum + 1;
     	if(selectedDomLayerNum > 0) {
 	    	selectedDomLayerNum--;
 	        takeSortList_2 = 0;
 			
-            var msg = new SpeechSynthesisUtterance();
-            var layerNum = selectedDomLayerNum + 1;
             msg.text = '階層' + layerNum  + '番目';
             msg.lang = 'ja-JP';
             speechSynthesis.speak(msg);
@@ -116,8 +115,6 @@ function minusDomLayerNum(){
                 click_flag = true;
             };
 	    }else{
-            var msg = new SpeechSynthesisUtterance();
-            var layerNum = selectedDomLayerNum + 1;
             msg.text = '階層' + layerNum  + '番目';
             msg.lang = 'ja-JP';
             speechSynthesis.speak(msg);
@@ -211,7 +208,7 @@ function speechText_domSort_2(selectNum){
 }
 
 function confirmStausOfSpeechsynthesis(){
-	if(!'SpeechSynthesisUtterance' in window){
+	if(!'SpeechSynthesisUtterance' in window ){
 		alert('web speech APIに未対応');
 		return;
 	}
